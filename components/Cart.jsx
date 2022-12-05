@@ -1,5 +1,4 @@
-import React, { useRef, useState } from "react";
-Link;
+import React, { useRef } from "react";
 import Link from "next/link";
 import {
     AiOutlineMinus,
@@ -9,6 +8,7 @@ import {
 } from "react-icons/ai";
 import { TiDeleteOutline } from "react-icons/ti";
 import toast from "react-hot-toast";
+
 import { useStateContext } from "../context/StateContext";
 import { urlFor } from "../lib/client";
 import getStripe from "../lib/getStripe";
@@ -20,25 +20,31 @@ const Cart = () => {
         totalQuantities,
         cartItems,
         setShowCart,
-        toggleCartItemQuantity,
-        onRemove,
+        toggleCartItemQuanitity,
+        onRemove
     } = useStateContext();
 
     const handleCheckout = async () => {
         const stripe = await getStripe();
-        const response = await fetch( "/api/stripe", {
+
+        const response = await fetch("/api/stripe", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(cartItems) 
+            body: JSON.stringify(cartItems),
         });
+
         if (response.statusCode === 500) return;
+
         const data = await response.json();
+
         toast.loading("Redirecting...");
+
         stripe.redirectToCheckout({ sessionId: data.id });
     };
-    return ( 
+
+    return (
         <div className="cart-wrapper" ref={cartRef}>
             <div className="cart-container">
                 <button
@@ -56,7 +62,7 @@ const Cart = () => {
                 {cartItems.length < 1 && (
                     <div className="empty-cart">
                         <AiOutlineShopping size={150} />
-                        <h3>Your shopping cart is empty</h3>
+                        <h3>Your shopping bag is empty</h3>
                         <Link href="/">
                             <button
                                 type="button"
@@ -68,9 +74,10 @@ const Cart = () => {
                         </Link>
                     </div>
                 )}
+
                 <div className="product-container">
                     {cartItems.length >= 1 &&
-                        cartItems.map((item, index) => (
+                        cartItems.map((item) => (
                             <div className="product" key={item._id}>
                                 <img
                                     src={urlFor(item?.image[0])}
@@ -79,7 +86,7 @@ const Cart = () => {
                                 <div className="item-desc">
                                     <div className="flex top">
                                         <h5>{item.name}</h5>
-                                        <h4>₹{item.price}</h4>
+                                        <h4>${item.price}</h4>
                                     </div>
                                     <div className="flex bottom">
                                         <div>
@@ -87,7 +94,7 @@ const Cart = () => {
                                                 <span
                                                     className="minus"
                                                     onClick={() =>
-                                                        toggleCartItemQuantity(
+                                                        toggleCartItemQuanitity(
                                                             item._id,
                                                             "dec"
                                                         )
@@ -95,13 +102,16 @@ const Cart = () => {
                                                 >
                                                     <AiOutlineMinus />
                                                 </span>
-                                                <span className="num">
+                                                <span
+                                                    className="num"
+                                                    onClick=""
+                                                >
                                                     {item.quantity}
                                                 </span>
                                                 <span
                                                     className="plus"
                                                     onClick={() =>
-                                                        toggleCartItemQuantity(
+                                                        toggleCartItemQuanitity(
                                                             item._id,
                                                             "inc"
                                                         )
@@ -123,12 +133,11 @@ const Cart = () => {
                             </div>
                         ))}
                 </div>
-
                 {cartItems.length >= 1 && (
                     <div className="cart-bottom">
                         <div className="total">
                             <h3>Subtotal:</h3>
-                            <h3>₹{totalPrice}</h3>
+                            <h3>${totalPrice}</h3>
                         </div>
                         <div className="btn-container">
                             <button
@@ -146,4 +155,4 @@ const Cart = () => {
     );
 };
 
-export default Cart;
+export default Cart 
