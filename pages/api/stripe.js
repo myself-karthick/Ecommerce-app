@@ -1,11 +1,9 @@
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
-        console.log(req.body);
-
         try {
             const params = {
                 submit_type: 'pay',
@@ -28,16 +26,16 @@ export default async function handler(req, res) {
                                 images: [newImage],
                             },
                             unit_amount: item.price * 100,
-                            adjustable_quantity: {
-                                enabled: true,
-                                minimum: 1,
-                            },
-                            quantity: item.quantity,
                         },
-                    };
+                        adjustable_quantity: {
+                            enabled: true,
+                            minimum: 1,
+                        },
+                        quantity: item.quantity
+                    }
                 }),
-                success_url: `${req.headers.origin}/success=true`,
-                cancel_url: `${req.headers.origin}/canceled=true`,
+                success_url: `${req.headers.origin}/success`,
+                cancel_url: `${req.headers.origin}/canceled`,
             }
 
             // Create Checkout Sessions from body params.
